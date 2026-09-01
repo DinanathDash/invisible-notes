@@ -287,8 +287,9 @@ document.addEventListener('selectionchange', () => {
 });
 
 function sanitizeHTML(html) {
-  const temp = document.createElement('div');
-  temp.innerHTML = html;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const temp = doc.body;
   
   const allowedTags = ['B', 'I', 'U', 'S', 'STRIKE', 'H1', 'H2', 'H3', 'P', 'PRE', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'SPAN', 'DIV', 'BR', 'FONT'];
   
