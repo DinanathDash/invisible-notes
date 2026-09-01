@@ -209,7 +209,7 @@ formatPopover.addEventListener('click', (e) => {
     const color = swatch.dataset.color;
     textEl.focus();
     document.execCommand('foreColor', false, color);
-    state.text = textEl.innerHTML;
+    state.text = '<!--RT-->' + textEl.innerHTML;
     push();
     return;
   }
@@ -238,7 +238,7 @@ formatPopover.addEventListener('click', (e) => {
   
   // Do not close the popover automatically so user can select multiple formatting options
   
-  state.text = textEl.innerHTML;
+  state.text = '<!--RT-->' + textEl.innerHTML;
   push();
 });
 
@@ -286,15 +286,46 @@ document.addEventListener('selectionchange', () => {
   });
 });
 
+function sanitizeHTML(html) {
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  
+  const allowedTags = ['B', 'I', 'U', 'S', 'STRIKE', 'H1', 'H2', 'H3', 'P', 'PRE', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'SPAN', 'DIV', 'BR', 'FONT'];
+  
+  const walk = (node) => {
+    if (node.nodeType === 1) { // Element
+      if (!allowedTags.includes(node.tagName.toUpperCase())) {
+        const textNode = document.createTextNode(node.textContent);
+        node.parentNode.replaceChild(textNode, node);
+      } else {
+        const style = node.getAttribute('style');
+        const color = node.getAttribute('color');
+        while(node.attributes.length > 0) {
+          node.removeAttribute(node.attributes[0].name);
+        }
+        if (style) node.setAttribute('style', style);
+        if (color) node.setAttribute('color', color);
+        Array.from(node.childNodes).forEach(walk);
+      }
+    }
+  };
+  Array.from(temp.childNodes).forEach(walk);
+  return temp.innerHTML;
+}
+
 function applyState() {
   applyColor(state.color);
   root.style.setProperty('--opacity', state.opacity);
   root.style.setProperty('--font-size', state.fontSize + 'px');
   opacityEl.value = Math.round(state.opacity * 100);
   
-  let content = state.text;
-  if (content && !/<[a-z][\s\S]*>/i.test(content)) {
-    content = content.replace(/\n/g, '<br>');
+  let content = state.text || '';
+  if (content.startsWith('<!--RT-->')) {
+    content = content.slice(9);
+  } else if (content) {
+    const temp = document.createElement('div');
+    temp.textContent = content; // Escape legacy plain text
+    content = temp.innerHTML.replace(/\n/g, '<br>');
   }
   if (textEl.innerHTML !== content) {
     textEl.innerHTML = content;
@@ -335,7 +366,7 @@ for (const name of Object.keys(COLORS)) {
 
 // Events
 textEl.addEventListener('input', () => {
-  state.text = textEl.innerHTML;
+  state.text = '<!--RT-->' + textEl.innerHTML;
   push();
 });
 
@@ -346,33 +377,11 @@ textEl.addEventListener('paste', (e) => {
   const plain = e.clipboardData.getData('text/plain');
 
   if (html) {
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
-    
-    const allowedTags = ['B', 'I', 'U', 'S', 'STRIKE', 'H1', 'H2', 'H3', 'P', 'PRE', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'SPAN', 'DIV', 'BR', 'FONT'];
-    
-    const walk = (node) => {
-      if (node.nodeType === 1) { // Element
-        if (!allowedTags.includes(node.tagName.toUpperCase())) {
-          const textNode = document.createTextNode(node.textContent);
-          node.parentNode.replaceChild(textNode, node);
-        } else {
-          const style = node.getAttribute('style');
-          while(node.attributes.length > 0) {
-            node.removeAttribute(node.attributes[0].name);
-          }
-          if (style) {
-            node.setAttribute('style', style);
-          }
-          Array.from(node.childNodes).forEach(walk);
-        }
-      }
-    };
-    Array.from(temp.childNodes).forEach(walk);
-    document.execCommand('insertHTML', false, temp.innerHTML);
+    document.execCommand('insertHTML', false, sanitizeHTML(html));
   } else {
     document.execCommand('insertText', false, plain);
   }
+  cleanWebKitStyles();
 });
 
 opacityEl.addEventListener('input', () => {

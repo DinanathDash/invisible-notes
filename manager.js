@@ -70,6 +70,8 @@ function createManagerModule({ store, actions }) {
 
   ipcMain.on('manager:delete', (e, id) => {
     if (typeof id !== 'string') return;
+    const targetWindow = BrowserWindow.fromWebContents(e.sender) || undefined;
+    if (targetWindow !== managerWindow) return;
     const record = store.get(id);
     if (!record) return;
     actions.deleteNoteRecord(id);
