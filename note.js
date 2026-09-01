@@ -378,8 +378,9 @@ textEl.addEventListener('paste', (e) => {
 
   if (html) {
     document.execCommand('insertHTML', false, sanitizeHTML(html));
-  } else {
-    document.execCommand('insertText', false, plain);
+  } else if (plain) {
+    const parsed = parseMarkdownToHTML(plain);
+    document.execCommand('insertHTML', false, sanitizeHTML(parsed));
   }
   cleanWebKitStyles();
 });
@@ -416,3 +417,51 @@ window.notes.getState(id).then((s) => {
   applyState();
   textEl.focus();
 });
+
+// Markdown Parser
+function parseMarkdownToHTML(text) {
+  let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  
+  const codeBlocks = [];
+  
+  html = html.replace(/```\w*\n([\s\S]*?)```/g, (match, p1) => {
+    codeBlocks.push(`<pre>${p1}</pre>`);
+    return `@@@CODEBLOCK${codeBlocks.length - 1}@@@`;
+  });
+  html = html.replace(/```([\s\S]*?)```/g, (match, p1) => {
+    codeBlocks.push(`<pre>${p1}</pre>`);
+    return `@@@CODEBLOCK${codeBlocks.length - 1}@@@`;
+  });
+  html = html.replace(/`([^`]+)`/g, (match, p1) => {
+    codeBlocks.push(`<pre>${p1}</pre>`);
+    return `@@@CODEBLOCK${codeBlocks.length - 1}@@@`;
+  });
+  
+  html = html.replace(/(?:^|\n)([\-\*]\s+[^\n]*(?:\n[\-\*]\s+[^\n]*)*)/g, (match, p1) => {
+    const listItems = p1.trim().split('\n').map(line => `<li>${line.replace(/^[\-\*]\s+/, '')}</li>`).join('');
+    return `\n<ul>${listItems}</ul>`;
+  });
+  html = html.replace(/(?:^|\n)(\d+\.\s+[^\n]*(?:\n\d+\.\s+[^\n]*)*)/g, (match, p1) => {
+    const listItems = p1.trim().split('\n').map(line => `<li>${line.replace(/^\d+\.\s+/, '')}</li>`).join('');
+    return `\n<ol>${listItems}</ol>`;
+  });
+  html = html.replace(/(?:^|\n)###\s+([^\n]*)/g, '\n<h3>$1</h3>');
+  html = html.replace(/(?:^|\n)##\s+([^\n]*)/g, '\n<h2>$1</h2>');
+  html = html.replace(/(?:^|\n)#\s+([^\n]*)/g, '\n<h1>$1</h1>');
+  html = html.replace(/(?:^|\n)&gt;\s+([^\n]*)/g, '\n<blockquote>$1</blockquote>');
+  
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  html = html.replace(/\*([^*]+)\*/g, '<i>$1</i>');
+  html = html.replace(/_([^_]+)_/g, '<i>$1</i>');
+  html = html.replace(/~~([^~]+)~~/g, '<s>$1</s>');
+  
+  html = html.replace(/\n/g, '<br>');
+  html = html.replace(/(<br>)*<(h1|h2|h3|ul|ol|blockquote|pre)>/gi, '<$2>');
+  html = html.replace(/<\/(h1|h2|h3|ul|ol|blockquote|pre)>(<br>)*/gi, '</$1>');
+  
+  codeBlocks.forEach((block, i) => {
+    html = html.replace(`@@@CODEBLOCK${i}@@@`, block);
+  });
+  
+  return html.trim();
+}
