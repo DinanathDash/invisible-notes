@@ -245,18 +245,23 @@ function buildTrayIcon() {
 }
 
 function noteLabel(record) {
-  const cleanText = (record.text || '')
-    .replace(/<br\s*[\/]?>/gi, ' ')
-    .replace(/<\/(div|p|h1|h2|h3|li|pre|blockquote|ul|ol)>/gi, ' ')
-    .replace(/<[^>]*>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim();
+  let cleanText = record.text || '';
+  if (cleanText.startsWith('<!--RT-->')) {
+    cleanText = cleanText.slice(9)
+      .replace(/<br\s*[\/]?>/gi, ' ')
+      .replace(/<\/(div|p|h1|h2|h3|li|pre|blockquote|ul|ol)>/gi, ' ')
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
+  } else {
+    cleanText = cleanText.replace(/\s+/g, ' ').trim();
+  }
   const snippet = (record.title || cleanText).slice(0, 30);
   return snippet || 'Untitled note';
 }

@@ -25,17 +25,23 @@ function label(note) {
 }
 
 function snippet(note) {
-  let text = (note.text || '')
-    .replace(/<br\s*[\/]?>/gi, '\n')
-    .replace(/<\/(div|p|h1|h2|h3|li|pre|blockquote|ul|ol)>/gi, '\n')
-    .replace(/<[^>]*>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .trim();
+  let text = note.text || '';
+  if (text.startsWith('<!--RT-->')) {
+    text = text.slice(9)
+      .replace(/<br\s*[\/]?>/gi, '\n')
+      .replace(/<\/(div|p|h1|h2|h3|li|pre|blockquote|ul|ol)>/gi, '\n')
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/[ \t]+/g, ' ')
+      .trim();
+  } else {
+    text = text.replace(/[ \t]+/g, ' ').trim();
+  }
   return text.split('\n')[0].substring(0, 100);
 }
 
