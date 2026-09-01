@@ -245,7 +245,13 @@ function buildTrayIcon() {
 }
 
 function noteLabel(record) {
-  const snippet = (record.title || record.text || '').replace(/\s+/g, ' ').trim().slice(0, 30);
+  const cleanText = (record.text || '')
+    .replace(/<br\s*[\/]?>/gi, ' ')
+    .replace(/<\/(div|p|h1|h2|h3|li)>/gi, ' ')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const snippet = (record.title || cleanText).slice(0, 30);
   return snippet || 'Untitled note';
 }
 

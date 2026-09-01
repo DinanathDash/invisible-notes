@@ -25,7 +25,12 @@ function label(note) {
 }
 
 function snippet(note) {
-  return (note.text || '').replace(/\s+/g, ' ').trim();
+  let text = (note.text || '')
+    .replace(/<br\s*[\/]?>/gi, '\n')
+    .replace(/<\/(div|p|h1|h2|h3|li)>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .trim();
+  return text.split('\n')[0].substring(0, 100);
 }
 
 function relativeTime(ts) {
@@ -103,7 +108,10 @@ function render() {
     deleteBtn.className = 'icon-btn danger';
     deleteBtn.title = 'Delete permanently';
     deleteBtn.innerHTML = ICONS.trash;
-    deleteBtn.addEventListener('click', () => window.manager.delete(note.id));
+    deleteBtn.addEventListener('click', () => {
+      noteToDelete = note.id;
+      document.getElementById('deleteModal').classList.add('open');
+    });
 
     actions.appendChild(deleteBtn);
 
@@ -139,4 +147,20 @@ window.manager.list().then((initial) => {
 
 window.manager.version().then((v) => {
   document.getElementById('version').textContent = 'Ghost Notes v' + v;
+});
+
+let noteToDelete = null;
+const modal = document.getElementById('deleteModal');
+
+document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+  modal.classList.remove('open');
+  noteToDelete = null;
+});
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+  if (noteToDelete) {
+    window.manager.delete(noteToDelete);
+    noteToDelete = null;
+  }
+  modal.classList.remove('open');
 });
