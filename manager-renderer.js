@@ -27,8 +27,14 @@ function label(note) {
 function snippet(note) {
   let text = (note.text || '')
     .replace(/<br\s*[\/]?>/gi, '\n')
-    .replace(/<\/(div|p|h1|h2|h3|li)>/gi, '\n')
+    .replace(/<\/(div|p|h1|h2|h3|li|pre|blockquote|ul|ol)>/gi, '\n')
     .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
     .trim();
   return text.split('\n')[0].substring(0, 100);
 }

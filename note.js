@@ -298,13 +298,15 @@ function sanitizeHTML(html) {
         const textNode = document.createTextNode(node.textContent);
         node.parentNode.replaceChild(textNode, node);
       } else {
-        const style = node.getAttribute('style');
-        const color = node.getAttribute('color');
+        const style = node.getAttribute('style') || '';
+        const colorAttr = node.getAttribute('color');
+        const m = style.match(/(?:^|;)\s*color\s*:\s*([^;]+)\s*/i);
+        const colorFromStyle = m ? m[1].trim() : '';
         while(node.attributes.length > 0) {
           node.removeAttribute(node.attributes[0].name);
         }
-        if (style) node.setAttribute('style', style);
-        if (color) node.setAttribute('color', color);
+        if (colorFromStyle) node.style.color = colorFromStyle;
+        if (colorAttr) node.setAttribute('color', colorAttr);
         Array.from(node.childNodes).forEach(walk);
       }
     }
@@ -327,6 +329,7 @@ function applyState() {
     temp.textContent = content; // Escape legacy plain text
     content = temp.innerHTML.replace(/\n/g, '<br>');
   }
+  if (content) content = sanitizeHTML(content);
   if (textEl.innerHTML !== content) {
     textEl.innerHTML = content;
   }
@@ -420,7 +423,7 @@ window.notes.getState(id).then((s) => {
 
 // Markdown Parser
 function parseMarkdownToHTML(text) {
-  let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  let html = text.replace(/\r\n/g, '\n').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   
   const codeBlocks = [];
   

@@ -247,10 +247,16 @@ function buildTrayIcon() {
 function noteLabel(record) {
   const cleanText = (record.text || '')
     .replace(/<br\s*[\/]?>/gi, ' ')
-    .replace(/<\/(div|p|h1|h2|h3|li)>/gi, ' ')
+    .replace(/<\/(div|p|h1|h2|h3|li|pre|blockquote|ul|ol)>/gi, ' ')
     .replace(/<[^>]*>/g, '')
     .replace(/\s+/g, ' ')
-    .trim();
+    .trim()
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
   const snippet = (record.title || cleanText).slice(0, 30);
   return snippet || 'Untitled note';
 }
