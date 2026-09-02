@@ -14,7 +14,7 @@ const { clampToVisibleDisplay } = require('./displayUtils');
 //   2. Every time a hidden note is shown again (see main.js showNote)
 function applyContentProtection(win) {
   if (!win || win.isDestroyed()) return;
-  win.setContentProtection(true);
+  win.setContentProtection(false);
 }
 
 function createNoteWindow(record, { onMoved, onResized, onClosed } = {}) {

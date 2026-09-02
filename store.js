@@ -26,6 +26,7 @@ function defaultRecord(overrides = {}) {
     fontSize: overrides.fontSize || 15,
     // Per-note monospace toggle for code walkthroughs (issue #7).
     monospace: !!overrides.monospace,
+    rich: !!overrides.rich,
     ghost: !!overrides.ghost,
     visible: overrides.visible !== undefined ? !!overrides.visible : true,
     // Pinned = always-on-top, survives switching focus to another app.

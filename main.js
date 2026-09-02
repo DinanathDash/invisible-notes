@@ -189,9 +189,10 @@ function reconcileOpenWindowsToDisplays() {
 // ---------- IPC from renderer ----------
 ipcMain.on('note:update', (e, payload) => {
   if (!payload || typeof payload.id !== 'string') return;
-  const { id, text, color, opacity, fontSize, monospace, ghost } = payload;
+  const { id, text, rich, color, opacity, fontSize, monospace, ghost } = payload;
   const patch = {};
   if (typeof text === 'string') patch.text = text;
+  if (typeof rich === 'boolean') patch.rich = rich;
   if (typeof color === 'string') patch.color = color;
   if (typeof opacity === 'number') patch.opacity = opacity;
   if (typeof fontSize === 'number') patch.fontSize = fontSize;
@@ -246,8 +247,8 @@ function buildTrayIcon() {
 
 function noteLabel(record) {
   let cleanText = record.text || '';
-  if (cleanText.startsWith('<!--RT-->')) {
-    cleanText = cleanText.slice(9)
+  if (record.rich) {
+    cleanText = cleanText
       .replace(/<br\s*[\/]?>/gi, ' ')
       .replace(/<\/(div|p|h1|h2|h3|li|pre|blockquote|ul|ol)>/gi, ' ')
       .replace(/<[^>]*>/g, '')

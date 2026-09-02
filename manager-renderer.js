@@ -26,8 +26,8 @@ function label(note) {
 
 function snippet(note) {
   let text = note.text || '';
-  if (text.startsWith('<!--RT-->')) {
-    text = text.slice(9)
+  if (note.rich) {
+    text = text
       .replace(/<br\s*[\/]?>/gi, '\n')
       .replace(/<\/(div|p|h1|h2|h3|li|pre|blockquote|ul|ol)>/gi, '\n')
       .replace(/<[^>]*>/g, '')
