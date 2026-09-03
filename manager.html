@@ -443,12 +443,12 @@
   <div id="version"></div>
 
   <div class="modal-overlay" id="deleteModal">
-    <div class="modal">
-      <h3>Delete Note</h3>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" tabindex="-1">
+      <h3 id="deleteModalTitle">Delete Note</h3>
       <p>Are you sure you want to delete this note permanently? This cannot be undone.</p>
       <div class="modal-actions">
-        <button class="btn cancel" id="cancelDeleteBtn">Cancel</button>
-        <button class="btn danger" id="confirmDeleteBtn">Delete</button>
+        <button class="btn cancel" id="cancelDeleteBtn" type="button">Cancel</button>
+        <button class="btn danger" id="confirmDeleteBtn" type="button">Delete</button>
       </div>
     </div>
   </div>
