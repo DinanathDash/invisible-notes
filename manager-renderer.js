@@ -180,8 +180,7 @@ function render() {
     deleteBtn.title = 'Delete permanently';
     deleteBtn.innerHTML = ICONS.trash;
     deleteBtn.addEventListener('click', () => {
-      noteToDelete = note.id;
-      document.getElementById('deleteModal').classList.add('open');
+      window.manager.delete(note.id);
     });
 
     actions.appendChild(deleteBtn);
@@ -408,20 +407,5 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !shortcutsEl.hidden) closeShortcuts();
 });
 
-let noteToDelete = null;
-const modal = document.getElementById('deleteModal');
-
-document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
-  modal.classList.remove('open');
-  noteToDelete = null;
-});
-
-document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-  if (noteToDelete) {
-    window.manager.delete(noteToDelete);
-    noteToDelete = null;
-  }
-  modal.classList.remove('open');
-});
 // Opened straight onto the legend from the tray's "Keyboard Shortcuts…" item.
 window.manager.onShowShortcuts(openShortcuts);

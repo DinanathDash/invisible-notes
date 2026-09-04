@@ -364,40 +364,6 @@
     border-top: 1px solid var(--border);
     background: var(--surface);
   }
-
-  /* ─── Modal ────────────────────────────────────────────── */
-  .modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(4px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .modal-overlay.open { display: flex; opacity: 1; }
-  .modal {
-    background: var(--surface);
-    border-radius: 12px;
-    width: 300px;
-    padding: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    text-align: center;
-    transform: scale(0.95);
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  .modal-overlay.open .modal { transform: scale(1); }
-  .modal h3 { margin-bottom: 10px; font-size: 16px; color: var(--ink); }
-  .modal p { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.4; }
-  .modal-actions { display: flex; gap: 10px; justify-content: center; }
-  .modal-actions .btn { flex: 1; justify-content: center; }
-  .modal-actions .btn.cancel { background: var(--surface-2); color: var(--ink); border: 1px solid var(--border); }
-  .modal-actions .btn.cancel:hover { background: var(--border); }
-  .modal-actions .btn.danger { background: #d3392e; color: #fff; }
-  .modal-actions .btn.danger:hover { background: #a9241b; }
 </style>
 </head>
 <body>
@@ -442,16 +408,6 @@
   <div class="list" id="list"></div>
   <div id="version"></div>
 
-  <div class="modal-overlay" id="deleteModal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" tabindex="-1">
-      <h3 id="deleteModalTitle">Delete Note</h3>
-      <p>Are you sure you want to delete this note permanently? This cannot be undone.</p>
-      <div class="modal-actions">
-        <button class="btn cancel" id="cancelDeleteBtn" type="button">Cancel</button>
-        <button class="btn danger" id="confirmDeleteBtn" type="button">Delete</button>
-      </div>
-    </div>
-  </div>
   <div class="sheet" id="shortcuts" hidden role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle">
     <div class="sheet-head">
       <h2 id="shortcutsTitle">Keyboard Shortcuts</h2>

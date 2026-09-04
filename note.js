@@ -363,10 +363,11 @@ function applyState() {
 }
 
 function push() {
+  state.rich = true;
   window.notes.update({
     id,
     text: state.text,
-    rich: true,
+    rich: state.rich,
     color: state.color,
     opacity: state.opacity,
     fontSize: state.fontSize,
@@ -392,9 +393,13 @@ for (const name of Object.keys(COLORS)) {
 }
 
 // Events
+let inputTimeout;
 textEl.addEventListener('input', () => {
-  state.text = sanitizeHTML(textEl.innerHTML);
-  push();
+  clearTimeout(inputTimeout);
+  inputTimeout = setTimeout(() => {
+    state.text = sanitizeHTML(textEl.innerHTML);
+    push();
+  }, 500);
 });
 
 // Security/Paste handling
